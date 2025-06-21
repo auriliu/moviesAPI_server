@@ -1,0 +1,4 @@
+store liked movie ids in your backend database (linked to user).
+create api endpoints to like/unlike movies (add/remove movie id).
+create api endpoint to fetch liked movies by user.
+in frontend, call these endpoints to update and get liked movies.
