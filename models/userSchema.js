@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  userName: { type: String, required: true },
-  likedMovies: [{ type: String }],
-  //  this ll be an array of liked movies ids...
+  name: { type: String, required: true },
+  id: { type: Number, required: true },
 });
 
 export default mongoose.model("User", userSchema);

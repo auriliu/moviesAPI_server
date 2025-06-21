@@ -1,9 +1,9 @@
-export const getAllMovies = (req, res) => {
-  res.send("get all movies");
-};
-
 export const createMovie = (req, res) => {
   res.send("create a movie");
+};
+
+export const getAllMovies = (req, res) => {
+  res.send("get all movies");
 };
 
 export const getMovie = (req, res) => {

@@ -8,12 +8,11 @@ import {
   deleteMovie,
 } from "../controllers/movies.controllers.js";
 
-export const movieRouter = express.Router();
+export const moviesRouter = express.Router();
 
-movieRouter.route("/movies").get(getAllMovies).post(createMovie);
+moviesRouter.get("/movies", getAllMovies);
+moviesRouter.post("/movies", createMovie);
 
-movieRouter
-  .route("/movies/:id")
-  .get(getMovie)
-  .patch(updateMovie)
-  .delete(deleteMovie);
+moviesRouter.get("/movies/:id", getMovie);
+moviesRouter.patch("/movies/:id", updateMovie);
+moviesRouter.delete("/movies/:id", deleteMovie);
