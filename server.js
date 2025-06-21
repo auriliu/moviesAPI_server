@@ -1,12 +1,14 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
-const cors = require("cors");
+import connectDB from "./mongoDB.js";
 
-const movieRouter = require("./routes/movieRouter.js");
+import express from "express";
+import cors from "cors";
+
+import { movieRouter } from "./routes/movies.routes.js";
 
 const PORT = process.env.PORT || 5000;
-const connectDB = require("./mongoDB.js");
 
 const app = express();
 app.use(express.json()); // parses incoming json into a js object.

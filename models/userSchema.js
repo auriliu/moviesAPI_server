@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   userName: { type: String, required: true },
@@ -6,5 +6,5 @@ const userSchema = new mongoose.Schema({
   //  this ll be an array of liked movies ids...
 });
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);
 // this ll create users collection on the db.
