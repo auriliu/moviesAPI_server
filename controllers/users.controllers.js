@@ -3,36 +3,36 @@ import User from "../models/userSchema.js";
 export const createUser = async (req, res) => {
   const newUser = new User({
     name: req.body.name,
-    id: req.body.id,
   });
-  const result = await newUser.save();
 
-  res.json(result);
+  const result = await newUser.save();
+  res.json({ result, message: "new user created successfully" });
 };
 
 export const getAllUsers = async (req, res) => {
   const users = await User.find();
-  res.json(users);
+  res.json({ users, message: "get all users" });
 };
 
 export const getUser = async (req, res) => {
   const { id } = req.params;
-
-  const user = await User.findOne({ id });
-  res.json(user);
+  const user = await User.findById(id);
+  res.json({ user, message: "get a user" });
 };
 
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
-  await User.deleteOne({ id });
-  res.send("user deleted");
+  await User.findOneAndDelete({ _id: id });
+  // find the obj where _id === id.
+  res.json({ message: "user deleted" });
 };
 
 export const updateUser = async (req, res) => {
-  const updatedUser = await User.updateOne(
-    { id: req.params.id },
-    { $set: req.body }
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    { $set: req.body },
+    { new: true }
   );
   res.json({ updatedUser, message: "update successful" });
 };

@@ -8,7 +8,12 @@ import {
   deleteUser,
 } from "../controllers/users.controllers.js";
 
+import { signup, login } from "../controllers/auth.controllers.js";
+
 export const usersRouter = express.Router();
+
+usersRouter.post("/users/signup", signup);
+usersRouter.post("/users/login", login);
 
 usersRouter.get("/users", getAllUsers);
 usersRouter.post("/users", createUser);
