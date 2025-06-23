@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
+import { promisify } from "util";
+
 const createToken = (id) => {
   // { id: newUser._id }, {id: id} = {id}
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -78,3 +80,32 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
+
+export const protect = async (req, res, next) => {
+  try {
+    // 1. get the token, check if it exists.
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    console.log("token:", token);
+
+    if (!token) {
+      return next(new Error("u r not logged in."));
+    }
+    // 2. token verification. [ LATER ]
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    // decoded ll have access to user id to check who is making a request.
+    next();
+    // 3. check if user still exists. [ LATER ]
+    // 4. check if user changed password after token was issued. [ LATER ]
+  } catch (error) {
+    next(error);
+  }
+};
+
+// to log out: stop sending the token via postman.

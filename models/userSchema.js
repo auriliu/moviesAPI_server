@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: [true, "tell as your name"] },
+  name: {
+    type: String,
+    // required: [true, "tell as your name"]
+  },
   // 2nd value- error message
   email: {
     type: String,

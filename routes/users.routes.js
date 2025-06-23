@@ -9,13 +9,16 @@ import {
 } from "../controllers/users.controllers.js";
 
 import { signup, login } from "../controllers/auth.controllers.js";
+import { protect } from "../controllers/auth.controllers.js";
 
 export const usersRouter = express.Router();
 
 usersRouter.post("/users/signup", signup);
 usersRouter.post("/users/login", login);
 
-usersRouter.get("/users", getAllUsers);
+// protect middleware:
+usersRouter.get("/users", protect, getAllUsers);
+// usersRouter.get("/users", getAllUsers);
 usersRouter.post("/users", createUser);
 
 usersRouter.get("/users/:id", getUser);
