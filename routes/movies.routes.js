@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import {
   getAllMovies,
@@ -8,11 +8,11 @@ import {
   deleteMovie,
 } from "../controllers/movies.controllers.js";
 
-export const moviesRouter = express.Router();
+export const movieRoutes = Router();
 
-moviesRouter.get("/movies", getAllMovies);
-moviesRouter.post("/movies", createMovie);
+movieRoutes.get("/", getAllMovies);
+movieRoutes.post("/", createMovie);
 
-moviesRouter.get("/movies/:id", getMovie);
-moviesRouter.patch("/movies/:id", updateMovie);
-moviesRouter.delete("/movies/:id", deleteMovie);
+movieRoutes.get("/:id", getMovie);
+movieRoutes.patch("/:id", updateMovie);
+movieRoutes.delete("/:id", deleteMovie);

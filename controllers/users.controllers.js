@@ -1,4 +1,4 @@
-import User from "../models/userSchema.js";
+import User from "../db/models/userSchema.js";
 
 export const createUser = async (req, res) => {
   const newUser = new User({
@@ -10,6 +10,9 @@ export const createUser = async (req, res) => {
 };
 
 export const getAllUsers = async (req, res) => {
+  // check here if that user id exists.
+  // not all the routes ll check for the token, but this one.
+
   const users = await User.find();
   res.json({ users, message: "get all users" });
 };

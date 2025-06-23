@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import {
   getAllUsers,
@@ -8,19 +8,13 @@ import {
   deleteUser,
 } from "../controllers/users.controllers.js";
 
-import { signup, login } from "../controllers/auth.controllers.js";
-import { protect } from "../controllers/auth.controllers.js";
+import { protect } from "../middlewares/auth.middleware.js";
 
-export const usersRouter = express.Router();
+export const userRoutes = Router();
 
-usersRouter.post("/users/signup", signup);
-usersRouter.post("/users/login", login);
+userRoutes.get("/", protect, getAllUsers);
+userRoutes.post("/", createUser);
 
-// protect middleware:
-usersRouter.get("/users", protect, getAllUsers);
-// usersRouter.get("/users", getAllUsers);
-usersRouter.post("/users", createUser);
-
-usersRouter.get("/users/:id", getUser);
-usersRouter.patch("/users/:id", updateUser);
-usersRouter.delete("/users/:id", deleteUser);
+userRoutes.get("/:id", getUser);
+userRoutes.patch("/:id", updateUser);
+userRoutes.delete("/:id", deleteUser);

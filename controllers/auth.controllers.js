@@ -1,19 +1,23 @@
-import User from "../models/userSchema.js";
+import User from "../db/models/userSchema.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
-
-import { promisify } from "util";
 
 const createToken = (id) => {
   // { id: newUser._id }, {id: id} = {id}
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+  // if u import all variables from the config file it ll be easier to read them from one place.
 };
+
+// controllers: what u want to do
+// middleware:
 
 // create new user:
 export const signup = async (req, res, next) => {
+  console.log("testing");
+
   try {
     // creating a new user:
     const newUser = new User({
@@ -23,13 +27,13 @@ export const signup = async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      confirmedPassword: req.body.confirmedPassword,
+      // confirmedPassword: req.body.confirmedPassword,
     });
     // after u signup, auto log in.
 
     const token = createToken(newUser._id);
 
-    newUser.confirmedPassword = undefined;
+    // newUser.confirmedPassword = undefined;
     // removes the password from the output.
     await newUser.save();
 
@@ -37,11 +41,14 @@ export const signup = async (req, res, next) => {
     const userObj = newUser.toObject();
     delete userObj.password;
     // sending back the response: with the newly created user.
+    // instead of returning the whole user, recreate a response with:
+    // id, name, email, token...
+
     res.status(201).json({
       status: "success",
       token,
       data: {
-        user: userObj,
+        newUser: userObj,
       },
     });
   } catch (error) {
@@ -63,6 +70,9 @@ export const login = async (req, res, next) => {
     }
     // 2. check if user exists && password is correct
     const user = await User.findOne({ email }).select("+password");
+    // const user = await User.findOne({ email }).select("-password");
+    // brings up everything except the password.
+
     // if (!user || !(await user.correctPassword(password, user.password))) {
     //   return next(new Error("incorrect credentials"));
     // }
@@ -76,33 +86,6 @@ export const login = async (req, res, next) => {
       status: "success",
       token,
     });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const protect = async (req, res, next) => {
-  try {
-    // 1. get the token, check if it exists.
-    let token;
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    }
-
-    console.log("token:", token);
-
-    if (!token) {
-      return next(new Error("u r not logged in."));
-    }
-    // 2. token verification. [ LATER ]
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    // decoded ll have access to user id to check who is making a request.
-    next();
-    // 3. check if user still exists. [ LATER ]
-    // 4. check if user changed password after token was issued. [ LATER ]
   } catch (error) {
     next(error);
   }
