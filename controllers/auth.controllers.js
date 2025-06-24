@@ -1,18 +1,14 @@
 import User from "../db/models/userSchema.js";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/config.js";
 
 const createToken = (id) => {
   // { id: newUser._id }, {id: id} = {id}
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+  return jwt.sign({ id }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
   });
   // if u import all variables from the config file it ll be easier to read them from one place.
 };
-
-// controllers: what u want to do
-// middleware:
 
 // create new user:
 export const signup = async (req, res, next) => {
@@ -56,11 +52,7 @@ export const signup = async (req, res, next) => {
   }
 };
 
-// 1. hash the password.
-// 2. validate inputs.
-// 3. remove confirmed password before saving.
-// 4. handle errors properly.
-
+// log the new user in:
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;

@@ -3,7 +3,7 @@ import {
   MONGODB_USER,
   MONGODB_PASSWORD,
   MONGODB_CLUSTER,
-} from "../config/config";
+} from "../config/config.js";
 
 const url = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/?retryWrites=true&w=majority&appName=Cluster0`;
 
