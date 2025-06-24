@@ -1,3 +1,26 @@
+//
+import { catchAsyncErrors } from "../utils/catchAsyncErrors.js";
+
+//eliminates the need for the try/catch block.
+// const catchAsyncErrors = (fn) => (req, res, next) => {
+//   return fn(req, res, next).catch((err) => next(err));
+// };
+
+export const getAAAllMovies = catchAsyncErrors(async (req, res) => {
+  res.send("get all movies");
+});
+
+// export const getAAAllMovies = async (req, res) => {
+//   try {
+//     res.send("get all movies");
+//   } catch (error) {
+//     res.status(500).json({ status: "error", message: error.message });
+//   }
+// };
+
+//
+//
+
 export const createMovie = (req, res) => {
   res.send("create a movie");
 };
