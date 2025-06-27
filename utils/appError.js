@@ -10,6 +10,9 @@ class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export default AppError;
+
 // explanation:
 // class AppError extends Error creates a custom error type based on JavaScript's Error.
 // constructor(message, statusCode) initializes with a message and HTTP status code.
@@ -18,8 +21,6 @@ class AppError extends Error {
 // this.status = statusCode.toString().startsWith("4") ? "fail" : "error" sets error type: "fail" for client errors (4xx), "error" for server errors (5xx).
 // this.isOperational = true marks this error as expected/handled by app logic.
 // Error.captureStackTrace(this, this.constructor) keeps clean stack trace, excluding constructor call.
-
-export default AppError;
 
 // you need the AppError class to create consistent, operational errors with status codes and messages in your app.
 // the errorHandler middleware catches all errors, including those created by AppError, and sends a proper response to the client.
