@@ -1,44 +1,46 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    // required: [true, "tell as your name"]
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "name is required"],
+      trim: true,
+      minlength: [2, "name must be at least 2 characters"],
+      maxlength: [50, "name must be at most 50 characters"],
+    },
+    email: {
+      type: String,
+      required: [true, "email is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/\S+@\S+\.\S+/, "please provide a valid email"],
+    },
+    password: {
+      type: String,
+      required: [true, "password is required"],
+      minlength: [3, "password must be at least 3 characters"],
+      select: false, // exclude password by default
+    },
+    // confirmedPassword is a virtual field, not saved in DB:
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  // 2nd value- error message
-  email: {
-    type: String,
-    // required: [true, "provide your email"],
-    unique: true,
-    lowercase: true,
-    // validate: [validate.isEmail, "provide a valid email"],
-    // import validator from npm.
-    // unique doesnt seem to work.
-  },
-  password: {
-    type: String,
-    required: [true, "provide a password"],
-    // minlength: 8,
-    select: false,
-    // select: false, wont show password in any output.
-    // select: false hides ONLY when quering.
-  },
-  confirmedPassword: {
-    type: String,
-    // required: [true, "confirm your password"],
-  },
+  {
+    timestamps: true, // auto-manage createdAt and updatedAt
+  }
+);
 
-  photo: String,
+// pre-save hook to hash password before saving:
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
 });
 
-// every User instance gets access to the .correctPassword() function.
-userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-};
-
-export default mongoose.model("User", userSchema);
-// this ll create users collection on the db.
+export default mongoose.model("User", UserSchema);

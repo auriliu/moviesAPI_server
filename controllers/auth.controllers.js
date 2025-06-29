@@ -1,85 +1,63 @@
 import User from "../db/models/userSchema.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/config.js";
 
-const createToken = (id) => {
-  // { id: newUser._id }, {id: id} = {id}
-  return jwt.sign({ id }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
-  // if u import all variables from the config file it ll be easier to read them from one place.
-};
-
-// create new user:
-export const signup = async (req, res, next) => {
-  console.log("testing");
-
+// signup
+export const signup = async (req, res) => {
   try {
-    // creating a new user:
+    const { name, email, password } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "user already exists." });
+
     const newUser = new User({
-      // allowing only this data
-      // with req.body, u d allow anything.
-      // e.g. role is not stored here.
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      // confirmedPassword: req.body.confirmedPassword,
+      name,
+      email,
+      password, // plain password, will be hashed by schema pre-save hook
     });
-    // after u signup, auto log in.
 
-    const token = createToken(newUser._id);
+    const freshUser = await newUser.save();
 
-    // newUser.confirmedPassword = undefined;
-    // removes the password from the output.
-    await newUser.save();
-
-    // to hide password in response, convert to object and delete it before sending:
-    const userObj = newUser.toObject();
-    delete userObj.password;
-    // sending back the response: with the newly created user.
-    // instead of returning the whole user, recreate a response with:
-    // id, name, email, token...
-
-    res.status(201).json({
-      status: "success",
-      token,
-      data: {
-        newUser: userObj,
-      },
+    // auto user login
+    const token = jwt.sign({ id: newUser._id }, "process.env.JWT_SECRET", {
+      expiresIn: "1h",
     });
-  } catch (error) {
-    next(error);
+
+    res.status(201).json({ message: "user created.", token, freshUser });
+    // end of auto user login
+  } catch (err) {
+    res.status(500).json({ message: "server error." });
+    console.log(err);
   }
 };
 
 // log the new user in:
-export const login = async (req, res, next) => {
+export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    // 1. check if email and password exist
-    if (!email || !password) {
-      return next(new Error("provide your credentials"));
-    }
-    // 2. check if user exists && password is correct
+    const { name, email, password } = req.body;
+
+    // check if email exists: do i need to add: .select("+password") ??
     const user = await User.findOne({ email }).select("+password");
-    // const user = await User.findOne({ email }).select("-password");
-    // brings up everything except the password.
+    if (!user) return res.status(400).json({ message: "invalid credentials." });
 
-    // if (!user || !(await user.correctPassword(password, user.password))) {
-    //   return next(new Error("incorrect credentials"));
-    // }
-    // HASH THE PASSWORDS WITH BCRYPT MISSING.
-    // HASH THE PASSWORDS WITH BCRYPT MISSING.
+    // check if password is correct
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "invalid credentials." });
 
-    // 3. if everything's ok, send the token to the client.
-    const token = createToken(user._id);
-
-    res.status(200).json({
-      status: "success",
-      token,
+    // issue the token
+    const token = jwt.sign({ id: user._id }, "JWT_SECRET_PLACEHOLDER", {
+      expiresIn: "1h",
     });
-  } catch (error) {
-    next(error);
+
+    // send it to the client.
+    res
+      .status(200)
+      .json({ message: "login successful.", token, user: { name: user.name } });
+  } catch (err) {
+    res.status(500).json({ message: "server error." });
   }
 };
 

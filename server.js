@@ -75,3 +75,6 @@ app.use((err, req, res, next) => {
 //     process.exit(1);
 //   });
 // });
+app.listen(9000, () => {
+  console.log("the server is up on 9000");
+});
